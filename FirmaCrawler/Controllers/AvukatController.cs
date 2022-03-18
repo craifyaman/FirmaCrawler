@@ -11,6 +11,8 @@ namespace FirmaCrawler.Controllers
         //GET:Avukat
         public ActionResult Index()
         {
+
+            //yeni ekledim
             return View();
         }
 

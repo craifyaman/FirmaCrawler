@@ -187,11 +187,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202202250848149_1.cs" />
-    <Compile Include="Migrations\202202250848149_1.designer.cs">
-      <DependentUpon>202202250848149_1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AltKategori.cs" />
     <Compile Include="Models\Dernek.cs" />
     <Compile Include="Models\Dil.cs" />
@@ -250,6 +245,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Migrations\" />
     <Folder Include="Views\Avukat\" />
     <Folder Include="Views\Dernek\" />
     <Folder Include="Views\Edit\" />
@@ -271,11 +267,6 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202202250848149_1.resx">
-      <DependentUpon>202202250848149_1.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
