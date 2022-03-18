@@ -182,11 +182,16 @@
     <Compile Include="Controllers\InstagramController.cs" />
     <Compile Include="Controllers\SnovIoController.cs" />
     <Compile Include="Controllers\ExporterController.cs" />
-    <Compile Include="Db.cs" />
+    <Compile Include="Db\Db.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202202250848149_1.cs" />
+    <Compile Include="Migrations\202202250848149_1.designer.cs">
+      <DependentUpon>202202250848149_1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AltKategori.cs" />
     <Compile Include="Models\Dernek.cs" />
     <Compile Include="Models\Dil.cs" />
