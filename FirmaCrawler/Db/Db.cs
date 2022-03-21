@@ -20,6 +20,8 @@ public partial class Db : DbContext
     public virtual DbSet<HsKodCeviri> HsKodCeviri { get; set; }
     public virtual DbSet<KategoriCeviri> KategoriCeviri { get; set; }
     public virtual DbSet<SirketTur> SirketTur { get; set; }
+    public virtual DbSet<InstaCrawlResult> InstaCrawlResult { get; set; }
+    public virtual DbSet<InstaCrawlPost> InstaCrawlPost { get; set; }
     
 
     public Db() : base("name=Model1")

@@ -1,5 +1,6 @@
 ﻿using ExcelDataReader;
 using FirmaCrawler.Models;
+using FuarCrawler.Models;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -28,17 +29,6 @@ namespace FuarCrawler.Controllers
             public string hashTag { get; set; }
         }
 
-        public class InstaCrawlResult
-        {
-            public string url { get; set; }
-            public string hashTag { get; set; }
-            public string account { get; set; }
-            public string name { get; set; }
-            public string description { get; set; }
-            public string type { get; set; }
-
-            public string JsonContent { get; set; }
-        }
         public void GetPostListFromHashTag()
         {
             // sayfalayarak 
@@ -66,7 +56,7 @@ namespace FuarCrawler.Controllers
               "implantoloji",
 
             };
-            
+
             var ayni = 0;
             var toplamPostSayisi = 0;
             foreach (var hashTag in hashTagList)
@@ -76,7 +66,7 @@ namespace FuarCrawler.Controllers
                 var i = 0;
                 while (i < 100000)
                 {
-                   
+
                     Thread.Sleep(3000);
                     js.ExecuteScript("window.scrollTo(0, document.body.scrollHeight);");
                     Thread.Sleep(2000);
@@ -106,7 +96,7 @@ namespace FuarCrawler.Controllers
 
                 list.AddRange(postList.Select(s => new InstaPost { hashTag = hashTag, url = s }));
 
-                
+
             }
 
             var excel = list.ToExcel(scheme => scheme
@@ -118,11 +108,10 @@ namespace FuarCrawler.Controllers
             driver.Close();
         }
 
-
-        public void GetAccountInfoFromPostList()
+        public void AddPostListFromExcell()
         {
-            var result = new List<InstaCrawlResult>();
-            var postList = new List<string>();
+            var db = new Db();
+            var postList = new List<InstaCrawlPost>();
             var hesapListesi = new List<string>();
 
             HtmlAgilityPack.HtmlDocument document = new HtmlAgilityPack.HtmlDocument(); //kütüphanemizi kullanıp htmldocument oluşturuyoruz.
@@ -143,8 +132,9 @@ namespace FuarCrawler.Controllers
                     {
                         while (reader.Read())
                         {
-                           var postUrl= reader.GetString(0);
-                            postList.Add(postUrl);
+                            var postUrl = reader.GetString(0);
+                            var hashtag = reader.GetString(1);
+                            postList.Add(new InstaCrawlPost { hashtag = hashtag, url = postUrl, process = false });
                         }
                     } while (reader.NextResult());
 
@@ -154,16 +144,49 @@ namespace FuarCrawler.Controllers
                     // The result of each spreadsheet is in result.Tables
                 }
             }
-            foreach (var item in postList)
+
+            db.InstaCrawlPost.AddRange(postList);
+            db.BulkSaveChanges();
+        }
+        public string GetAccountInfoFromPostList(int id)
+        {
+            var s = "";
+            var db = new Db();
+            var result = new List<InstaCrawlResult>();
+
+            var lastCrawl = db.InstaCrawlPost.Where(i => i.lastCrawl)==null? db.InstaCrawlPost.FirstOrDefault(): db.InstaCrawlPost.Where(i => i.lastCrawl).ToList().LastOrDefault();
+            var lastCrawlId = lastCrawl.InstaCrawlPostId;
+            var lastRecordId = db.InstaCrawlPost.Max(i => i.InstaCrawlPostId);
+
+            if (lastCrawlId == lastRecordId) return "Yeni Kayıt Yok";
+            
+
+            HtmlAgilityPack.HtmlDocument document = new HtmlAgilityPack.HtmlDocument(); //kütüphanemizi kullanıp htmldocument oluşturuyoruz.
+
+            var liste = db.InstaCrawlPost.Where(i => i.InstaCrawlPostId > lastCrawlId).Take(id).ToList();
+
+            lastCrawl.lastCrawl = false;
+            liste.LastOrDefault().lastCrawl = true;
+            db.BulkSaveChanges();
+
+            foreach (var item in liste)
             {
+                s += "," + item.InstaCrawlPostId;
                 try
                 {
-                    string link = $"http://api.scrape.do/?token=65b53271fcb348c1b070597861dbedb4b750cdce1ef&url=https://www.instagram.com{item}"; //link değişkenine çekeceğimiz web sayafasının linkini yazıyoruz.
+                    //var client = new WebClient();
+                    //client.Encoding = Encoding.UTF8;
+                    //client.Proxy = new WebProxy("zproxy.lum-superproxy.io:22225");
+                    //client.Proxy.Credentials = new NetworkCredential("lum-customer-c_106dea10-zone-zone1", "31m4tmxnrysd");
+                    //var url = $"http://instagram.com{item.url}";
+                    //string html =client.DownloadString(url);
+
+                    string link = $"http://api.scrape.do/?token=65b53271fcb348c1b070597861dbedb4b750cdce1ef&url=https://www.instagram.com{item.url}"; //link değişkenine çekeceğimiz web sayafasının linkini yazıyoruz.
 
                     Uri url = new Uri(link); //Uri tipinde değişeken linkimizi veriyoruz.
 
                     WebClient client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
-                                                        //client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
+                    client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
                     client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
 
                     string html = client.DownloadString(url); // siteye bağlanıp tüm sayfanın html içeriğini çekiyoruz.
@@ -173,20 +196,12 @@ namespace FuarCrawler.Controllers
 
                     var content = document.DocumentNode.SelectNodes("//script").FirstOrDefault(f => f.Attributes["type"].Value == "application/ld+json").InnerHtml;
 
-                    //var json = "{'@context':{'test':'http://www.test.com/'},'test:hello':'world'}";
                     var json = content;
                     var doc = JObject.Parse(json);
                     var hesap = doc["author"]["alternateName"].ToString();
 
-                    if (hesapListesi.Distinct().Count()==10)
-                    {
-                        break;
-                    }
+                    item.account = hesap;
 
-                    if (!hesapListesi.Contains(hesap))
-                    {
-                        hesapListesi.Add(hesap);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -195,54 +210,77 @@ namespace FuarCrawler.Controllers
                 }
             }
 
-            foreach (var item in hesapListesi)
-            {
-                try
-                {
-                    string link = $"http://api.scrape.do/?token=65b53271fcb348c1b070597861dbedb4b750cdce1ef&url=https://www.instagram.com/{item.Replace("@", "")}"; //link değişkenine çekeceğimiz web sayafasının linkini yazıyoruz.
+            #region Tasşı
+            //db.BulkSaveChanges();
 
-                    Uri url = new Uri(link); //Uri tipinde değişeken linkimizi veriyoruz.
+            //foreach (var item in hesapListesi)
+            //{
+            //    try
+            //    {
+            //        string link = $"http://api.scrape.do/?token=65b53271fcb348c1b070597861dbedb4b750cdce1ef&url=https://www.instagram.com/{item.Replace("@", "")}"; //link değişkenine çekeceğimiz web sayafasının linkini yazıyoruz.
 
-                    WebClient client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
-                                                        //client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
-                    client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
+            //        Uri url = new Uri(link); //Uri tipinde değişeken linkimizi veriyoruz.
 
-                    string html = client.DownloadString(url); // siteye bağlanıp tüm sayfanın html içeriğini çekiyoruz.
+            //        WebClient client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
+            //                                            //client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
+            //        client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
 
-                    document = new HtmlAgilityPack.HtmlDocument(); //kütüphanemizi kullanıp htmldocument oluşturuyoruz.
-                    document.LoadHtml(html);//documunt değişkeninin html ine çektiğimiz htmli veriyoruz
+            //        string html = client.DownloadString(url); // siteye bağlanıp tüm sayfanın html içeriğini çekiyoruz.
 
-                    var content = document.DocumentNode.SelectNodes("//script").FirstOrDefault(f => f.Attributes["type"].Value == "application/ld+json")?.InnerHtml;
-                    var sharedData = document.DocumentNode.SelectNodes("//script").FirstOrDefault(f => f.InnerText.Contains("window._sharedData ="))?.InnerHtml;
-                    //var json = "{'@context':{'test':'http://www.test.com/'},'test:hello':'world'}";
-                    var json = content;
-                    var doc = JObject.Parse(json);
-                    var type = doc["@type"].ToString();
-                    var name = doc["name"].ToString();
-                    var desc = doc["description"].ToString();
+            //        document = new HtmlAgilityPack.HtmlDocument(); //kütüphanemizi kullanıp htmldocument oluşturuyoruz.
+            //        document.LoadHtml(html);//documunt değişkeninin html ine çektiğimiz htmli veriyoruz
+
+            //        var content = document.DocumentNode.SelectNodes("//script").FirstOrDefault(f => f.Attributes["type"].Value == "application/ld+json")?.InnerHtml;
+            //        var sharedData = document.DocumentNode.SelectNodes("//script").FirstOrDefault(f => f.InnerText.Contains("window._sharedData ="))?.InnerHtml;
+            //        //var json = "{'@context':{'test':'http://www.test.com/'},'test:hello':'world'}";
+            //        var json = content;
+
+            //        if (!string.IsNullOrEmpty(json))
+            //        {
+            //            var doc = JObject.Parse(json);
+            //            var type = doc["@type"]?.ToString();
+            //            var name = doc["name"]?.ToString();
+            //            var desc = doc["description"]?.ToString();
+            //            var website = doc["url"]?.ToString();
+
+            //            result.Add(new InstaCrawlResult
+            //            {
+            //                account = item,
+            //                description = desc,
+            //                name = name,
+            //                type = type,
+            //                hashTag = "",
+            //                JsonContent = content,
+            //                Aciklama = "BURSA",
+            //                Firma = "Medya Fuarcılık",
+            //                url= website
+            //            });
+
+            //        }
+
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        continue;
+            //    }
+            //}
 
 
-                    result.Add(new InstaCrawlResult { account = item, description = desc, name = name, type = type, hashTag = "bursadişhekimi",JsonContent= content });
+            // var r = result.ToExcel(scheme => scheme
+            //     .AddColumn("account", x => x.account)
+            //     .AddColumn("description", x => x.description)
+            //     .AddColumn("name", x => x.name)
+            //     .AddColumn("type", x => x.type)
+            //     .AddColumn("hashTag", x => x.hashTag)
+            //);
 
-                }
-                catch (Exception ex)
-                {
-                    continue;
-                }
-            }
+            // System.IO.File.WriteAllBytes(@"C:\Users\Kullanıcı\Desktop\result\result.xlsx", r);
+            #endregion
 
+            db.BulkSaveChanges();
 
-            var r = result.ToExcel(scheme => scheme
-                .AddColumn("account", x => x.account)
-                .AddColumn("description", x => x.description)
-                .AddColumn("name", x => x.name)
-                .AddColumn("type", x => x.type)
-                .AddColumn("hashTag", x => x.hashTag)
-           );
-
-            System.IO.File.WriteAllBytes(@"C:\Users\Kullanıcı\Desktop\result\result.xlsx", r);
+            return s;
         }
-
         public void SnovIoBanka()
         {
             var db = new Db();
@@ -403,7 +441,6 @@ namespace FuarCrawler.Controllers
 
             driver.Close();
         }
-
         public static By SelectorByAttributeValue(string p_strAttributeName, string p_strAttributeValue)
         {
             return (By.XPath(String.Format("//*[@{0} = '{1}']", p_strAttributeName, p_strAttributeValue)));

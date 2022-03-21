@@ -182,18 +182,29 @@
     <Compile Include="Controllers\InstagramController.cs" />
     <Compile Include="Controllers\SnovIoController.cs" />
     <Compile Include="Controllers\ExporterController.cs" />
+    <Compile Include="Controllers\WhatsAppController.cs" />
+    <Compile Include="Db\Configuration.cs" />
     <Compile Include="Db\Db.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202202250848149_1.cs" />
-    <Compile Include="Migrations\202202250848149_1.designer.cs">
-      <DependentUpon>202202250848149_1.cs</DependentUpon>
+    <Compile Include="Migrations\202203181230137_2.cs" />
+    <Compile Include="Migrations\202203181230137_2.designer.cs">
+      <DependentUpon>202203181230137_2.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Migrations\202203191108424_3.cs" />
+    <Compile Include="Migrations\202203191108424_3.designer.cs">
+      <DependentUpon>202203191108424_3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202203191159190_4.cs" />
+    <Compile Include="Migrations\202203191159190_4.designer.cs">
+      <DependentUpon>202203191159190_4.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\AltKategori.cs" />
     <Compile Include="Models\Dernek.cs" />
+    <Compile Include="Models\InstaCrawlPost.cs" />
+    <Compile Include="Models\InstaCrawlResult .cs" />
     <Compile Include="Models\Dil.cs" />
     <Compile Include="Models\DisHekimi.cs" />
     <Compile Include="Models\ExporterFirma.cs" />
@@ -250,7 +261,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Migrations\" />
     <Folder Include="Views\Avukat\" />
     <Folder Include="Views\Dernek\" />
     <Folder Include="Views\Edit\" />
@@ -259,6 +269,7 @@
     <Folder Include="Views\IhracatciBirlikleri\" />
     <Folder Include="Views\SnovIo\" />
     <Folder Include="Views\TurkishExporter\" />
+    <Folder Include="Views\WhatsApp\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -272,6 +283,17 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202203181230137_2.resx">
+      <DependentUpon>202203181230137_2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202203191108424_3.resx">
+      <DependentUpon>202203191108424_3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202203191159190_4.resx">
+      <DependentUpon>202203191159190_4.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
