@@ -3,10 +3,12 @@ using System.Data.Entity.ModelConfiguration.Conventions;
 using Migrations;
 using System.Data.Entity;
 using FuarCrawler.Models;
+using FirmaCrawler.Models;
 
 public partial class Db : DbContext
 {
     public virtual DbSet<Firma> Firma { get; set; }
+    public virtual DbSet<CrawlUrl> CrawlUrl { get; set; }
     public virtual DbSet<FirmaEposta> FirmaEposta { get; set; }
     public virtual DbSet<KaynakTip> KaynakTip { get; set; }
     public virtual DbSet<Kaynak> Kaynak { get; set; }
@@ -22,6 +24,9 @@ public partial class Db : DbContext
     public virtual DbSet<SirketTur> SirketTur { get; set; }
     public virtual DbSet<InstaCrawlResult> InstaCrawlResult { get; set; }
     public virtual DbSet<InstaCrawlPost> InstaCrawlPost { get; set; }
+    public virtual DbSet<Doktor> Doktor { get; set; }
+
+     
     
 
     public Db() : base("name=Model1")

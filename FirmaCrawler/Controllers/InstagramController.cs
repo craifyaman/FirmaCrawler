@@ -1,20 +1,18 @@
-﻿using ExcelDataReader;
+﻿using ArrayToExcel;
+using ExcelDataReader;
 using FirmaCrawler.Models;
 using FuarCrawler.Models;
 using Newtonsoft.Json.Linq;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using RandomSolutions;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
 
@@ -146,7 +144,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.InstaCrawlPost.AddRange(postList);
-            db.BulkSaveChanges();
+            db.SaveChanges();
         }
         public string GetAccountInfoFromPostList(int id)
         {
@@ -167,7 +165,7 @@ namespace FuarCrawler.Controllers
 
             lastCrawl.lastCrawl = false;
             liste.LastOrDefault().lastCrawl = true;
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
             foreach (var item in liste)
             {
@@ -186,7 +184,6 @@ namespace FuarCrawler.Controllers
                     Uri url = new Uri(link); //Uri tipinde değişeken linkimizi veriyoruz.
 
                     WebClient client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
-                    client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
                     client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
 
                     string html = client.DownloadString(url); // siteye bağlanıp tüm sayfanın html içeriğini çekiyoruz.
@@ -211,7 +208,7 @@ namespace FuarCrawler.Controllers
             }
 
             #region Tasşı
-            //db.BulkSaveChanges();
+            //db.SaveChanges();
 
             //foreach (var item in hesapListesi)
             //{
@@ -277,7 +274,7 @@ namespace FuarCrawler.Controllers
             // System.IO.File.WriteAllBytes(@"C:\Users\Kullanıcı\Desktop\result\result.xlsx", r);
             #endregion
 
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
             return s;
         }
@@ -434,7 +431,7 @@ namespace FuarCrawler.Controllers
                 }
 
                 db.Firma.AddRange(firmaList);
-                db.BulkSaveChanges();
+                db.SaveChanges();
             }
 
 

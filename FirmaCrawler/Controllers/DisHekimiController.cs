@@ -1,7 +1,7 @@
-﻿using FirmaCrawler.Models;
+﻿using ArrayToExcel;
+using FirmaCrawler.Models;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using RandomSolutions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

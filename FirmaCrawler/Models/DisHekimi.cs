@@ -18,5 +18,6 @@ namespace FirmaCrawler.Models
         public string Il { get; set; }
         public string Ilce { get; set; }
         public string Adres { get; internal set; }
+        public object Web { get; internal set; }
     }
 }

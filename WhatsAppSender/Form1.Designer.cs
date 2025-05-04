@@ -38,12 +38,15 @@ namespace WhatsAppSender
             this.txtMesaj = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtGonderimAdeti = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.txtApiBaseUrl = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtDllPath = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnMesajGonder
             // 
-            this.btnMesajGonder.Location = new System.Drawing.Point(143, 358);
+            this.btnMesajGonder.Location = new System.Drawing.Point(143, 488);
             this.btnMesajGonder.Name = "btnMesajGonder";
             this.btnMesajGonder.Size = new System.Drawing.Size(164, 23);
             this.btnMesajGonder.TabIndex = 0;
@@ -99,7 +102,7 @@ namespace WhatsAppSender
             this.txtMesaj.Location = new System.Drawing.Point(143, 153);
             this.txtMesaj.Multiline = true;
             this.txtMesaj.Name = "txtMesaj";
-            this.txtMesaj.Size = new System.Drawing.Size(164, 175);
+            this.txtMesaj.Size = new System.Drawing.Size(466, 307);
             this.txtMesaj.TabIndex = 6;
             // 
             // label4
@@ -118,22 +121,47 @@ namespace WhatsAppSender
             this.txtGonderimAdeti.Size = new System.Drawing.Size(164, 23);
             this.txtGonderimAdeti.TabIndex = 9;
             // 
-            // button1
+            // txtApiBaseUrl
             // 
-            this.button1.Location = new System.Drawing.Point(397, 50);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(164, 23);
-            this.button1.TabIndex = 10;
-            this.button1.Text = "Gönder";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.txtApiBaseUrl.Location = new System.Drawing.Point(445, 33);
+            this.txtApiBaseUrl.Name = "txtApiBaseUrl";
+            this.txtApiBaseUrl.Size = new System.Drawing.Size(164, 23);
+            this.txtApiBaseUrl.TabIndex = 11;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(341, 36);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(70, 15);
+            this.label5.TabIndex = 10;
+            this.label5.Text = "Api Base Url";
+            // 
+            // txtDllPath
+            // 
+            this.txtDllPath.Location = new System.Drawing.Point(445, 78);
+            this.txtDllPath.Name = "txtDllPath";
+            this.txtDllPath.Size = new System.Drawing.Size(164, 23);
+            this.txtDllPath.TabIndex = 13;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(341, 81);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(47, 15);
+            this.label6.TabIndex = 14;
+            this.label6.Text = "Dll Yolu";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(688, 428);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(886, 601);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.txtDllPath);
+            this.Controls.Add(this.txtApiBaseUrl);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.txtGonderimAdeti);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.txtMesaj);
@@ -161,7 +189,10 @@ namespace WhatsAppSender
         private System.Windows.Forms.TextBox txtMesaj;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtGonderimAdeti;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox txtApiBaseUrl;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtDllPath;
+        private System.Windows.Forms.Label label6;
     }
 }
 

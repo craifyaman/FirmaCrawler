@@ -1,16 +1,8 @@
-﻿using Newtonsoft.Json;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using RandomSolutions;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Mvc;
 
 namespace FirmaCrawler.Controllers
@@ -106,7 +98,7 @@ namespace FirmaCrawler.Controllers
             }
 
             db.Firma.AddRange(firmalar);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         public void KayseriOsb()
@@ -202,7 +194,7 @@ namespace FirmaCrawler.Controllers
             }
 
             db.Firma.AddRange(firmalar);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
     }

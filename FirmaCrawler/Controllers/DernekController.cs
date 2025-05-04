@@ -1,7 +1,10 @@
-﻿using Newtonsoft.Json;
-using RandomSolutions;
+﻿using ArrayToExcel;
+using DocumentFormat.OpenXml.Office2013.Drawing.Chart;
+using FuarCrawler.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Metadata.Edm;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -93,8 +96,8 @@ namespace FirmaCrawler.Controllers
             .AddColumn("WebSitesi", x => x.WebSitesi));
 
             System.IO.File.WriteAllBytes(@"D:\Dernekler.xlsx", excel);
-            
-           
+
+
 
         }
 
@@ -134,6 +137,124 @@ namespace FirmaCrawler.Controllers
             }
         }
 
+        public void AimsadOrg()
+        {
+            var pages = 5;
 
+            var db = new Db();
+            var firmaListesi = new List<Firma>();
+            var insert = new List<Firma>();
+            var tümSayfalar = new List<string>();
+
+
+            Kaynak kaynak;
+            if (db.Kaynak.FirstOrDefault(i=>i.Adi=="AimsadOrg")==null)
+            {
+                kaynak= new Kaynak();
+                kaynak.Adi = "AimsadOrg";
+                kaynak.KaynakTipId = 148;
+                db.Kaynak.Add(kaynak);
+                db.SaveChanges();
+
+
+            }
+            else
+            {
+                kaynak = db.Kaynak.FirstOrDefault(i => i.Adi == "AimsadOrg");
+            }
+
+            var firmaEposta = db.FirmaEposta.ToList();
+            var firmalar = db.Firma.ToList();
+
+
+
+            WebClient client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
+            client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
+
+            for (int i = 1; i <= pages; i++)
+            {
+                try
+                {
+
+                    var link = $"https://www.aimsad.org/firmalar/yurtici/{i}";
+
+                    Uri url = new Uri(link); //Uri tipinde değişeken linkimizi veriyoruz.
+                    string html = client.DownloadString(url); // siteye bağlanıp tüm sayfanın html içeriğini çekiyoruz.
+
+                    HtmlAgilityPack.HtmlDocument document = new HtmlAgilityPack.HtmlDocument(); //kütüphanemizi kullanıp htmldocument oluşturuyoruz.
+                    document.LoadHtml(html);//documunt değişkeninin html ine çektiğimiz htmli veriyoruz
+
+                    var firmaUrls = document.DocumentNode.SelectNodes("//a").Where(w => w.Attributes["href"].Value.Contains("/firmalar/")).Select(s => s.Attributes["href"].Value).ToList();
+                    tümSayfalar.AddRange(firmaUrls);
+                }
+                catch (Exception ex)
+                {
+
+                    continue;
+                }
+
+            }
+
+            tümSayfalar = tümSayfalar.Distinct().Where(i => !i.Contains("yurtici")).ToList();
+            
+            foreach (var i in tümSayfalar)
+            {
+
+                try
+                {
+                    Uri url = new Uri(i); //Uri tipinde değişeken linkimizi veriyoruz.
+                    string html = client.DownloadString(url); // siteye bağlanıp tüm sayfanın html içeriğini çekiyoruz.
+
+                    HtmlAgilityPack.HtmlDocument document = new HtmlAgilityPack.HtmlDocument(); //kütüphanemizi kullanıp htmldocument oluşturuyoruz.
+                    document.LoadHtml(html);//documunt değişkeninin html ine çektiğimiz htmli veriyoruz
+
+                    var unvan = document.DocumentNode.SelectNodes("//span").Where(w => w.HasClass("old-president--underline")).FirstOrDefault().InnerText.Replace("&nbsp;", "").Trim();
+                    var adres = document.DocumentNode.SelectNodes("//p").Where(w => w.HasClass("sub-search__address--txt")).Select(s => s.InnerText.Trim()).Aggregate((a, b) => a + " " + b);
+                    var tel = document.DocumentNode.SelectNodes("//a").Where(w => w.Attributes["href"].Value.Contains("tel:"))?.FirstOrDefault().Attributes["href"].Value.Replace("tel:", "");
+                    var eposta = document.DocumentNode.SelectNodes("//a").Where(w => w.Attributes["href"].Value.Contains("mailto:"))?.FirstOrDefault().Attributes["href"].Value.Replace("mailto:", "");
+                    var web = document.DocumentNode.SelectNodes("//svg").Where(w => w.HasClass("icon-web")).FirstOrDefault().ParentNode.NextSibling.NextSibling.InnerText.Replace("Web Sitesi :", "").Trim();
+
+                    var etiket = document.DocumentNode.SelectNodes("//a").Where(w => w.Attributes["href"].Value.Contains("&kategori=")).Select(s => s.InnerText.Trim()).Aggregate((a, b) => a + "," + b);
+                    var ihracat = document.DocumentNode.SelectNodes("//a").Where(w => w.Attributes["href"].Value.Contains("&faaliyet=")).Select(s => s.InnerText.Trim()).Aggregate((a, b) => a + "," + b).Contains("İHRACAT");
+
+                    firmaListesi.Add(new Firma
+                    {
+                        Unvan = unvan,
+                        WebSitesi = web.Replace("https://", "").Replace("http://", "").Replace("www.", ""),
+                        Eposta = eposta,
+                        Telefon = tel,
+                        Adres = adres,
+                        IhracatDurumu = ihracat ? "VAR" : ""
+                    });
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
+
+            }
+
+            foreach (var f in firmaListesi)
+            {
+                var fEposta = firmaEposta.FirstOrDefault(i => i.Eposta == f.Eposta);
+                var firma = firmalar.FirstOrDefault(i => i.WebSitesi == f.WebSitesi);
+                if (firma==null && fEposta==null)
+                {
+                    f.FirmaEposta = new List<FirmaEposta> { new FirmaEposta { Eposta = f.Eposta } };
+                    f.FirmaKaynakRelation = new List<FirmaKaynakRelation> { new FirmaKaynakRelation { KaynakId = kaynak.KaynakId } };
+                    insert.Add(f);
+                }else if(firma!=null && fEposta == null)
+                {
+                    db.FirmaKaynakRelation.Add(new FirmaKaynakRelation { FirmaId = firma.FirmaId, KaynakId=kaynak.KaynakId });
+                    db.FirmaEposta.Add(new FirmaEposta { FirmaId = firma.FirmaId, Eposta = f.Eposta });
+                }
+                 
+            }
+
+            db.Firma.AddRange(insert);
+            db.SaveChanges();
+
+
+        }
     }
 }

@@ -243,7 +243,7 @@ namespace FuarCrawler.Controllers
             }
             var insert = firma.Where(i => !firmaKodlari.Contains(i.Kod)).ToList();
             Db.ExporterFirma.AddRange(insert);
-            Db.BulkSaveChanges();
+            Db.SaveChanges();
         }
 
         public string ExporterFirmaDetay()
@@ -346,7 +346,7 @@ namespace FuarCrawler.Controllers
 
             var etkInsert = etiket.Where(i => !etk.Contains(i.Adi)).ToList();
             Db.Etiket.AddRange(etkInsert);
-            Db.BulkSaveChanges();
+            Db.SaveChanges();
 
             var k = kodlar.Aggregate((a, b) => a + "," + b).ToString();
             return k;

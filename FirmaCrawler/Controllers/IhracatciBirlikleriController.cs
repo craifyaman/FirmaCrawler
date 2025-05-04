@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using RandomSolutions;
+﻿ 
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -94,7 +93,7 @@ namespace FuarCrawler.Controllers
                     }
                 }
                 db.Firma.AddRange(list);
-                db.BulkSaveChanges();
+                db.SaveChanges();
             }
 
         }
@@ -179,7 +178,7 @@ namespace FuarCrawler.Controllers
                     }
                 }
                 db.Firma.AddRange(list);
-                db.BulkSaveChanges();
+                db.SaveChanges();
             }
 
         }

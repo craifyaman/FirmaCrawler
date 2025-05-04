@@ -1,4 +1,7 @@
 ﻿
+using ArrayToExcel;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using FirmaCrawler.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +19,14 @@ namespace FuarCrawler.Controllers
         {
             fuarList = new List<Fuar>
             {
-                new Fuar 
+                new Fuar
                 {
                     BaseUrl="https://www.hardwareeurasia.com/",
                     PaginationUrl="katilimci-listesi?page=",
                     PageCount=8,
                     KaynakId=200,
                     Tip=1,
-                    TipAciklama="Listeleme Sayfasından Bilgi Çekiliyor" 
+                    TipAciklama="Listeleme Sayfasından Bilgi Çekiliyor"
                 },
                 new Fuar
                 {
@@ -78,6 +81,7 @@ namespace FuarCrawler.Controllers
                         var web = tdList[1].Descendants("dic").ToList()[0].InnerText.Replace("Web: ", "").Trim();
                         var urunGruplariList = tdList[5].Descendants("li").Where(j => j.HasClass("table-detail-wrapper__list-item")).ToList();
                         var urunGruplari = urunGruplariList.Count() > 0 ? urunGruplariList.Select(j => j.InnerText).Aggregate((a, b) => a + "," + b) : "";
+
                         var firma = new Firma();
                         firma.Unvan = unvan;
                         firma.Adres = adres;
@@ -121,7 +125,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.Firma.AddRange(insertlist);
-            db.BulkSaveChanges();
+            db.SaveChanges();
         }
         /// <summary>
         /// 31.07.2021 TARİHİNDE AKTARILDI
@@ -212,7 +216,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.Firma.AddRange(insertlist);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         /// <summary>
@@ -303,7 +307,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.Firma.AddRange(insertlist);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         /// <summary>
@@ -395,7 +399,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.Firma.AddRange(insertlist);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         /// <summary>
@@ -492,7 +496,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.Firma.AddRange(insertlist);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
 
@@ -594,7 +598,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.Firma.AddRange(insertlist);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         /// <summary>
@@ -692,7 +696,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.Firma.AddRange(insertlist);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         /// <summary>
@@ -787,7 +791,7 @@ namespace FuarCrawler.Controllers
             }
 
             db.Firma.AddRange(insertlist);
-            db.BulkSaveChanges();
+            db.SaveChanges();
         }
         /// <summary>
         /// 31.07.2021 TARİHİNDE AKTARILDI
@@ -885,7 +889,7 @@ namespace FuarCrawler.Controllers
         //    }
 
         //    db.Firma.AddRange(insertlist);
-        //    db.BulkSaveChanges();
+        //    db.SaveChanges();
 
         //}
         public void ExpoMed()
@@ -985,7 +989,7 @@ namespace FuarCrawler.Controllers
 
             db.Firma.AddRange(insertlist);
             db.FirmaKaynakRelation.AddRange(firmaKaynakRelation);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         public void BoatAntalya()
@@ -1050,7 +1054,7 @@ namespace FuarCrawler.Controllers
         public void IplikFuari()
         {
             var firmalar = new List<Firma>();
-            var sayfaSayisi = 22;
+            var sayfaSayisi = 27;
             var firmaDetaySayfaları = new List<string>();
             for (int i = 1; i <= sayfaSayisi; i++)
             {
@@ -1081,10 +1085,11 @@ namespace FuarCrawler.Controllers
 
                         var iletisimWeb = tdList[1].Descendants("div").ToList();
                         var iletisim = iletisimWeb[0].InnerText.Replace("İletişim: +90 ", "").Trim();
-                        var web = tdList[1].Descendants("dic").ToList()[0].InnerText.Replace("Web: ", "").Trim();
+                        var web = tdList[1].Descendants("div").ToList()[1].InnerText.Replace("Web: ", "").Trim();
                         var urunGruplariList = tdList[5].Descendants("li").Where(j => j.HasClass("table-detail-wrapper__list-item")).ToList();
                         var urunGruplari = urunGruplariList.Count() > 0 ? urunGruplariList.Select(j => j.InnerText).Aggregate((a, b) => a + "," + b) : "";
                         var firma = new Firma();
+
                         firma.Unvan = unvan;
                         firma.Adres = adres;
                         firma.Il = il;
@@ -1104,6 +1109,22 @@ namespace FuarCrawler.Controllers
 
                 }
             }
+
+            var items = firmalar.Select(x => new
+            {
+                Unvan = x.Unvan,
+                Adres = x.Adres,
+                Il = x.Il,
+                Ilce = x.Ilce,
+                WebSitesi = x.WebSitesi,
+                CepTelefon = x.CepTelefon,
+                Telefon = x.Telefon,
+                Kaynak = x.Kaynak,
+            });
+
+            var excel = items.ToExcel();
+
+            System.IO.File.WriteAllBytes("C:\\Users\\raify\\Desktop\\Desktop\\Fuar\\2023\\" + "İplik Fuarı 2023.xlsx", excel);
 
         }
         public void IstanbulMobilyaFuari()
@@ -1261,7 +1282,7 @@ namespace FuarCrawler.Controllers
 
             db.Firma.AddRange(insertlist);
             db.FirmaKaynakRelation.AddRange(firmaKaynakRelation);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         public void MadenTurkiye()
@@ -1462,7 +1483,7 @@ namespace FuarCrawler.Controllers
 
             db.Firma.AddRange(insertlist);
             db.FirmaKaynakRelation.AddRange(firmaKaynakRelation);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
         public void HostIstanbul()
@@ -1570,7 +1591,7 @@ namespace FuarCrawler.Controllers
             db.Firma.AddRange(insertlist);
             db.FirmaKaynakRelation.AddRange(firmaKaynakRelation);
             db.FirmaEposta.AddRange(firmaEposta);
-            db.BulkSaveChanges();
+            db.SaveChanges();
         }
         public void AsansorIstanbul()
         {
@@ -1684,7 +1705,7 @@ namespace FuarCrawler.Controllers
             db.Firma.AddRange(insertlist);
             db.FirmaKaynakRelation.AddRange(firmaKaynakRelation);
             db.FirmaEposta.AddRange(firmaEposta);
-            db.BulkSaveChanges();
+            db.SaveChanges();
         }
         public void TuyapDetaysiz()
         {
@@ -1785,8 +1806,160 @@ namespace FuarCrawler.Controllers
 
             db.Firma.AddRange(insertlist);
             db.FirmaKaynakRelation.AddRange(firmaKaynakRelation);
-            db.BulkSaveChanges();
+            db.SaveChanges();
         }
+
+
+
+        public void Eventseye()
+        {
+            var list = new List<EventsEyeFuar>();
+            var sayfaSayisi = 39;
+            var firmaDetaySayfaları = new List<string>();
+            for (int i = 0; i < sayfaSayisi; i++)
+            {
+                string link = "";
+                if (i == 0)
+                {
+                    link = "https://www.eventseye.com/fairs/z1_trade-shows_america.html";
+                }
+                else
+                {
+                    link = $"https://www.eventseye.com/fairs/z1_trade-shows_america_{i}.html";
+                }
+                //link değişkenine çekeceğimiz web sayafasının linkini yazıyoruz.
+
+                Uri url = new Uri(link); //Uri tipinde değişeken linkimizi veriyoruz.
+
+                WebClient client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
+                client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
+
+                string html = client.DownloadString(url); // siteye bağlanıp tüm sayfanın html içeriğini çekiyoruz.
+
+                HtmlAgilityPack.HtmlDocument document = new HtmlAgilityPack.HtmlDocument(); //kütüphanemizi kullanıp htmldocument oluşturuyoruz.
+                document.LoadHtml(html);//documunt değişkeninin html ine çektiğimiz htmli veriyoruz
+
+                var fuarlistesi = document.DocumentNode.SelectNodes("//tr").Where(j => j.ParentNode.Name == "tbody" && j.ParentNode.ParentNode.HasClass("tradeshows")).ToList();
+                foreach (var tr in fuarlistesi)
+                {
+                    var f = new EventsEyeFuar();
+                    try
+                    {
+                        var adi = tr.ChildNodes[1].ChildNodes[1].ChildNodes[0].InnerText;
+                        var aciklamasi = tr.ChildNodes[1].ChildNodes[1].ChildNodes[1].InnerText;
+                        var _url = tr.ChildNodes[1].ChildNodes[1].Attributes["href"].Value;
+
+                        var dongu = tr.ChildNodes[3].InnerText;
+
+                        var sehir = tr.ChildNodes[5].ChildNodes[1].InnerText;
+                        var sehirUrl = "";
+
+                        try
+                        {
+                            sehirUrl = tr.ChildNodes[5].ChildNodes[1].Attributes["href"].Value;
+                        }
+                        catch (Exception)
+                        {
+
+                            sehirUrl = "";
+                        }
+                        var fuarMerkezi = tr.ChildNodes[5].ChildNodes.Count > 3 ? tr.ChildNodes[5].ChildNodes[3].InnerText : "";
+                        var fuarMerkeziUrl = tr.ChildNodes[5].ChildNodes.Count > 3 ? tr.ChildNodes[5].ChildNodes[3].Attributes["href"].Value : "";
+
+                        var tarih = tr.ChildNodes[7].ChildNodes[0].InnerText;
+                        var sure = "";
+                        try
+                        {
+                            sure = tr.ChildNodes[7].ChildNodes[2] != null ? tr.ChildNodes[7].ChildNodes[2].InnerText : "";
+                        }
+                        catch (Exception)
+                        {
+
+                            sure = "";
+                        }
+
+                        f.Aciklama = aciklamasi;
+                        f.Adi = adi;
+                        f.Dongu = dongu;
+                        f.FuarMerkezi = fuarMerkezi;
+                        f.FuarMerkeziurl = fuarMerkeziUrl;
+                        f.FuarSuresi = sure;
+                        f.FuarUrl = _url;
+                        f.FuarSuresi = sure;
+                        f.Sehir = sehir;
+                        f.SehirUrl = sehirUrl;
+                        f.Tarih = tarih;
+                        list.Add(f);
+
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        continue;
+                    }
+
+                }
+
+                
+            }
+
+            foreach (var item in list)
+            {
+                try
+                {
+                    var link = $"https://www.eventseye.com/fairs/{item.FuarUrl}";
+
+                    //link değişkenine çekeceğimiz web sayafasının linkini yazıyoruz.
+
+                    var url = new Uri(link); //Uri tipinde değişeken linkimizi veriyoruz.
+
+                    var client = new WebClient(); // webclient nesnesini kullanıyoruz bağlanmak için.
+                    client.Encoding = Encoding.UTF8; //türkçe karakter sorunu yapmaması için encoding utf8 yapıyoruz.
+
+                    var html = client.DownloadString(url); // siteye bağlanıp tüm sayfanın html içeriğini çekiyoruz.
+                    var document = new HtmlAgilityPack.HtmlDocument(); //kütüphanemizi kullanıp htmldocument oluşturuyoruz.
+                    document.LoadHtml(html);//documunt değişkeninin html ine çektiğimiz htmli veriyoruz
+
+                    var endust = document.DocumentNode.SelectNodes("//div").Where(j => j.HasClass("industries")).FirstOrDefault().ChildNodes.Where(f => f.Name == "a");
+
+                    if (endust != null)
+                    {
+                        var endustri = endust.Select(s => s.InnerText).Aggregate((a, b) => a + "," + b);
+                        item.BaglantiliEndustri = endustri;
+                    }
+                }
+                catch (Exception)
+                {
+
+                    continue;
+                }
+
+
+            }
+
+            var excel = list.ToExcel();
+
+            System.IO.File.WriteAllBytes(@"C:\Users\raify\Desktop\EventsEye-Amerika.xlsx", excel);
+        }
+
+
+    }
+
+    internal class EventsEyeFuar
+    {
+        public string Adi { get; set; }
+        public string Fuar { get; set; }
+        public string FuarUrl { get; set; }
+        public string Aciklama { get; set; }
+        public string Dongu { get; set; }
+        public string Sehir { get; set; }
+        public string SehirUrl { get; set; }
+        public string FuarMerkezi { get; set; }
+        public string FuarMerkeziurl { get; set; }
+        public string Tarih { get; set; }
+        public string FuarSuresi { get; set; }
+        public string BaglantiliEndustri { get; set; }
 
 
     }

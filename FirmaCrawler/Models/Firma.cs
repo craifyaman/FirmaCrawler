@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 public partial class Firma
 {
@@ -19,30 +17,22 @@ public partial class Firma
     public string CepTelefon { get; set; }
     public string Eposta { get; set; }
     public string WebSitesi { get; set; }
-
     public string Yetkili { get; set; }
-
     public string Nace { get; set; }
     public string MeslekGrubu { get; set; }
     public string Urun { get; set; }
     public string Sektor { get; set; }
-
     public string OdaSicilNo { get; set; }
     public string TicaretSicilNo { get; set; }
-
     public string VergiDairesi { get; set; }
     public string VergiNo { get; set; }
-
     public string IhracatDurumu { get; set; }
-
     public Nullable<bool> MobilUyumlu { get; set; }
     public Nullable<int> MobilTestDenemeSayisi { get; set; }
     public string MobilTestHata { get; set; }
-
     public string Kaynak { get; set; }
     public string KaynakTip { get; set; }
     public string KaynakGuid { get; set; }
-
     public DateTime? KayıtTarihi { get; set; }
     public bool WebSitesindenMail { get; set; }
     public string WebSitesindenMailHata { get; set; }
@@ -55,8 +45,12 @@ public partial class Firma
     public virtual ICollection<FirmaEtiketRelation> FirmaEtiketRelation { get; set; }
     public virtual ICollection<FirmaKaynakRelation> FirmaKaynakRelation { get; set; }
     public virtual ICollection<FirmaEposta> FirmaEposta { get; set; }
-
+    [NotMapped]
+    public List<string> EpostaListesi { get; set; }
     [NotMapped]
     public List<string> EtiketListesi { get; set; }
-
+    [NotMapped]
+    public string Etiket { get; set; }
+    [NotMapped]
+    public int EpostaSayisi { get; set; }
 }

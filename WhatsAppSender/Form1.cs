@@ -37,19 +37,47 @@ namespace WhatsAppSender
         {
             InitializeComponent();
 
-            var personelListesi = JsonConvert.DeserializeObject<List<SelectListItem>>(Request("https://localhost:44365/whatsapp/PersonelListesi"));
+            txtApiBaseUrl.Text = "https://crm.medyafuarcilik.com";
+            txtDllPath.Text = @"C:\WebDrivers";
+
+            var personelListesi = JsonConvert.DeserializeObject<List<SelectListItem>>(Request($"{txtApiBaseUrl.Text}/whatsapp/PersonelListesi"));
 
             cmbPersonel.DataSource = personelListesi;
             cmbPersonel.DisplayMember = "Text";
             cmbPersonel.ValueMember = "Value";
 
-            var gonderimListesi = JsonConvert.DeserializeObject<List<SelectListItem>>(Request("https://localhost:44365/whatsapp/GonderimListesi"));
+            var gonderimListesi = JsonConvert.DeserializeObject<List<SelectListItem>>(Request($"{txtApiBaseUrl.Text}/whatsapp/GonderimListesi"));
 
             cmbGonderimListesi.DataSource = gonderimListesi;
             cmbGonderimListesi.DisplayMember = "Text";
             cmbGonderimListesi.ValueMember = "Value";
 
 
+        }
+
+        private void btnMesajGonderClick(object sender, EventArgs e)
+        {
+            driver = driver = new ChromeDriver(txtDllPath.Text);
+
+            for (int i = 0; i < Convert.ToInt32(txtGonderimAdeti.Text); i++)
+            {
+                try
+                {
+                    var kisi = JsonConvert.DeserializeObject<Kisi>(Request($"{txtApiBaseUrl.Text}/whatsapp/numaraal/{cmbGonderimListesi.SelectedValue}"));
+
+                    MesajYolla(new Mesaj { Tel = kisi.Telefon, Icerik = txtMesaj.Text });
+                    System.Threading.Thread.Sleep(5000);
+                    var url = $"{txtApiBaseUrl.Text}/whatsapp/numaraisle?gonderimId={cmbGonderimListesi.SelectedValue}&kisiId={kisi.KisiId}&personelId={cmbPersonel.SelectedValue}";
+                    Request(url);
+                }
+                catch (Exception ex)
+                {
+                    continue;
+
+                }
+            }
+
+            driver.Close();
         }
         public void MesajYolla(Mesaj m)
         {
@@ -125,22 +153,7 @@ namespace WhatsAppSender
 
             return req;
         }
-        private void btnMesajGonderClick(object sender, EventArgs e)
-        {
-            driver = driver = new ChromeDriver(@"C:\WebDrivers");
-
-            for (int i = 0; i < Convert.ToInt32(txtGonderimAdeti.Text); i++)
-            {
-                var kisi = JsonConvert.DeserializeObject<Kisi>(Request($"https://localhost:44365/whatsapp/numaraal/{cmbGonderimListesi.SelectedValue}"));
-
-                MesajYolla(new Mesaj { Tel = kisi.Telefon, Icerik = txtMesaj.Text });
-                System.Threading.Thread.Sleep(5000);
-                var url= $"https://localhost:44365/whatsapp/numaraisle?gonderimId={cmbGonderimListesi.SelectedValue}&kisiId={kisi.KisiId}&personelId={cmbPersonel.SelectedValue}";
-                Request(url);
-            }
-
-            driver.Close();
-        }
+       
 
         private void button1_Click(object sender, EventArgs e)
         {

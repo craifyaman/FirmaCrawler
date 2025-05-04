@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿
+using ArrayToExcel;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using RandomSolutions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -170,7 +170,7 @@ namespace FirmaCrawler.Controllers
                 }
 
                 db.Firma.AddRange(firmaListe);
-                db.BulkSaveChanges();
+                db.SaveChanges();
             }
 
 
@@ -254,7 +254,7 @@ namespace FirmaCrawler.Controllers
                 }
 
                 db.Firma.AddRange(firmaListe);
-                db.BulkSaveChanges();
+                db.SaveChanges();
                 driver.Close();
             }
 
@@ -341,7 +341,7 @@ namespace FirmaCrawler.Controllers
                 }
 
                 db.Firma.AddRange(firmalar);
-                db.BulkSaveChanges();
+                db.SaveChanges();
 
 
 
@@ -420,7 +420,7 @@ namespace FirmaCrawler.Controllers
             }
 
             db.Firma.AddRange(firmalar);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
 
         }
@@ -520,7 +520,7 @@ namespace FirmaCrawler.Controllers
             }
 
             db.Firma.AddRange(firmalar);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
 
         }
@@ -651,7 +651,7 @@ namespace FirmaCrawler.Controllers
             {
                 insertlist.ForEach(f => f.Il = "KONYA");
                 db.Firma.AddRange(insertlist);
-                db.BulkSaveChanges();
+                db.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -722,7 +722,7 @@ namespace FirmaCrawler.Controllers
             }
 
             db.Firma.AddRange(firmalar);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
 
         }
@@ -1930,7 +1930,7 @@ namespace FirmaCrawler.Controllers
 
 
             db.Firma.AddRange(firmalar);
-            db.BulkSaveChanges();
+            db.SaveChanges();
 
         }
 
